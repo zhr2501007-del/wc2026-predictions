@@ -5,69 +5,75 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>2026世界杯 · 预测台账</title>
 <style>
- :root{--bg:#0f1216;--card:#171c22;--line:#262d36;--fg:#e8edf2;--mut:#8a97a6;--ok:#2fbf71;--no:#e5484d;--accent:#3b82f6}
+ :root{--bg:#0f1216;--card:#171c22;--card2:#1b222a;--line:#262d36;--fg:#e8edf2;--mut:#8a97a6;--ok:#2fbf71;--no:#e5484d;--accent:#3b82f6;--pill:#232b34}
  *{box-sizing:border-box}
  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--fg);-webkit-text-size-adjust:100%}
- .wrap{max-width:920px;margin:0 auto;padding:16px}
+ .wrap{max-width:900px;margin:0 auto;padding:16px}
  h1{font-size:20px;margin:6px 0 2px}
  .sub{color:var(--mut);font-size:12px;margin-bottom:14px;line-height:1.6}
- .cards{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
- .card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;flex:1;min-width:150px}
- .card .k{color:var(--mut);font-size:12px}
- .card .v{font-size:24px;font-weight:700;margin-top:4px}
- .card .v small{font-size:12px;color:var(--mut);font-weight:400}
- .mini{color:var(--mut);font-size:11px;margin:2px 0 16px}
- h2{font-size:15px;margin:18px 0 8px}
- .tw{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
- table{border-collapse:collapse;width:100%;font-size:13px;min-width:600px}
- th,td{padding:9px 8px;text-align:center;border-bottom:1px solid var(--line);white-space:nowrap}
- th{background:#1b222a;color:var(--mut);font-weight:600}
- td.match{text-align:left;font-weight:600}
- tr:last-child td{border-bottom:none}
- .ok{color:var(--ok);font-weight:700}
- .no{color:var(--no);font-weight:700}
- .pend{color:var(--mut)}
- .foot{color:var(--mut);font-size:12px;margin-top:14px;line-height:1.7}
+ .sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:6px}
+ .scard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+ .scard .k{color:var(--mut);font-size:12px}
+ .scard .v{font-size:26px;font-weight:800;margin-top:3px}
+ .scard .v small{font-size:12px;color:var(--mut);font-weight:400}
+ .mini{color:var(--mut);font-size:11px;margin:4px 2px 18px}
+ h2{font-size:15px;margin:16px 0 10px}
+ .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+ .m{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
+ .m .top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}
+ .m .name{font-size:15px;font-weight:700}
+ .pill{font-size:11px;color:var(--mut);background:var(--pill);border:1px solid var(--line);border-radius:999px;padding:3px 9px;white-space:nowrap}
+ .pill.done{color:var(--ok);border-color:rgba(47,191,113,.35)}
+ .row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px dashed var(--line)}
+ .row .lab{color:var(--mut);font-size:13px}
+ .row .val{font-weight:600;font-size:14px}
+ .row .val .mk{margin-left:8px;font-weight:800}
+ .real{display:flex;justify-content:space-between;align-items:center;background:var(--card2);border-radius:10px;padding:9px 11px;margin-top:10px}
+ .real .lab{color:var(--mut);font-size:12px}
+ .real .v{font-weight:800;font-size:15px}
+ .final{display:flex;justify-content:space-between;align-items:center;margin-top:10px;font-size:13px}
+ .final .lab{color:var(--mut)}
+ .ok{color:var(--ok)}.no{color:var(--no)}.pend{color:var(--mut)}
+ .foot{color:var(--mut);font-size:12px;margin-top:16px;line-height:1.7}
  a{color:var(--accent)}
 </style>
 </head>
 <body>
 <div class="wrap">
  <h1>⚽ 2026世界杯 · 预测台账</h1>
- <div class="sub">胜负=晋级方 · 主/次比分为两档预测，<b>主或次任一命中即算比分命中（允许1次容错）</b> · 比分只比90分钟常规时间。每天北京时间约20:00自动核对+更新。</div>
- <div class="cards" id="summary"></div>
+ <div class="sub">胜负=晋级方 · 主/次两档比分，<b>任一命中即算比分命中（允许1次容错）</b> · 只比90分钟。每小时自动核对更新。</div>
+ <div class="sum" id="summary"></div>
  <div class="mini" id="mini"></div>
  <h2>实盘预测</h2>
- <div class="tw"><table id="tbl">
-  <thead><tr><th>对阵</th><th>胜负预测</th><th>主比分</th><th>次比分</th><th>真实(90')</th><th>胜负中?</th><th>主分中?</th><th>次分中?</th></tr></thead>
-  <tbody></tbody>
- </table></div>
+ <div class="grid" id="grid"></div>
  <div class="foot" id="foot"></div>
 </div>
 <script>
-const yn=(b)=> b===true?'<span class="ok">✓</span>': b===false?'<span class="no">✗</span>':'<span class="pend">—</span>';
+const mk=(b)=> b===true?'<span class="ok">✓</span>': b===false?'<span class="no">✗</span>':'<span class="pend">—</span>';
 const pct=(a,b)=> b? Math.round(a/b*100)+'%':'—';
-function card(k,v,p){return `<div class="card"><div class="k">${k}</div><div class="v">${p} <small>${v}</small></div></div>`}
+const scard=(k,v,p)=>`<div class="scard"><div class="k">${k}</div><div class="v">${p} <small>${v}</small></div></div>`;
+function row(lab,val,b){return `<div class="row"><span class="lab">${lab}</span><span class="val">${val||'—'}<span class="mk">${mk(b)}</span></span></div>`}
 fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(rows=>{
   const s=rows.filter(r=>r.settled), n=s.length;
   const win=s.filter(r=>r.hitWinner).length;
-  const scoreHit=s.filter(r=> r.hitPrimary===true || r.hitSecondary===true).length;
-  const priStrict=s.filter(r=>r.hitPrimary===true).length;
+  const sh=s.filter(r=>r.hitPrimary===true||r.hitSecondary===true).length;
+  const pri=s.filter(r=>r.hitPrimary===true).length;
   document.getElementById('summary').innerHTML=
-    card('胜负 / 晋级', win+' / '+n, pct(win,n))+
-    card('比分命中 · 容错', scoreHit+' / '+n, pct(scoreHit,n));
-  document.getElementById('mini').innerHTML= n? `其中「主比分严格命中」${priStrict} / ${n}（${pct(priStrict,n)}）· 已结算 ${n} 场`:'尚无已结算场次';
-  document.querySelector('#tbl tbody').innerHTML=rows.map(r=>`<tr>
-    <td class="match">${r.match}</td>
-    <td>${r.winner||'—'}</td>
-    <td>${r.primary||'—'}</td>
-    <td>${r.secondary||'—'}</td>
-    <td>${r.actual||'<span class="pend">待核</span>'}</td>
-    <td>${yn(r.hitWinner)}</td>
-    <td>${yn(r.hitPrimary)}</td>
-    <td>${yn(r.hitSecondary)}</td>
-  </tr>`).join('');
-  document.getElementById('foot').innerHTML='盲测校准（回测，不计入上方实盘）：晋级 6/7 · 精确比分 3/7 —— 详见 <a href="https://github.com/zhr2501007-del/wc2026-predictions/blob/main/BACKTEST.md">BACKTEST.md</a>。所有真实结果均来自 web 检索核对，未核实标「待核」。';
+    scard('胜负 / 晋级', win+' / '+n, pct(win,n))+
+    scard('比分命中 · 容错', sh+' / '+n, pct(sh,n));
+  document.getElementById('mini').innerHTML= n? `其中「主比分严格命中」${pri} / ${n}（${pct(pri,n)}）· 已结算 ${n} 场`:'尚无已结算场次，等赛后自动核对';
+  document.getElementById('grid').innerHTML=rows.map(r=>{
+    const settled=r.settled, sHit= settled? (r.hitPrimary===true||r.hitSecondary===true):null;
+    return `<div class="m">
+      <div class="top"><span class="name">${r.match}</span><span class="pill ${settled?'done':''}">${settled?'已结束':'待核'}</span></div>
+      ${row('胜负预测', r.winner, settled? r.hitWinner:null)}
+      ${row('主比分', r.primary, settled? r.hitPrimary:null)}
+      ${row('次比分', r.secondary, settled? r.hitSecondary:null)}
+      <div class="real"><span class="lab">真实比分(90')</span><span class="v">${r.actual|| '<span class="pend">待核</span>'}</span></div>
+      <div class="final"><span class="lab">比分命中(容错)</span><span>${mk(sHit)}</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('foot').innerHTML='盲测校准（回测，不计入上方实盘）：晋级 6/7 · 精确比分 3/7 —— 详见 <a href="https://github.com/zhr2501007-del/wc2026-predictions/blob/main/BACKTEST.md">BACKTEST.md</a>。真实结果均来自 web 检索核对，未核实标「待核」。';
 });
 </script>
 </body>
