@@ -23,7 +23,8 @@
  .chips::-webkit-scrollbar{display:none}
  .chip{flex:0 0 auto;white-space:nowrap;font-size:12px;color:var(--mut);background:var(--pill);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;user-select:none}
  .chip.on{color:#fff;background:var(--accent);border-color:var(--accent)}
- .daseg{color:var(--mut);font-size:12px;font-weight:700;margin:14px 2px 8px;letter-spacing:.3px}
+ .daseg{position:sticky;top:0;z-index:2;background:var(--bg);color:var(--fg);font-size:14px;font-weight:800;letter-spacing:.3px;padding:10px 4px;margin:16px 0 10px;border-bottom:2px solid var(--accent)}
+ .daseg .cnt{color:var(--mut);font-size:12px;font-weight:500;margin-left:6px}
  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
  .m{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 15px}
  .m .top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
@@ -65,6 +66,8 @@ const pct=(a,b)=> b? Math.round(a/b*100)+'%':'—';
 const scard=(k,v,p)=>`<div class="scard"><div class="k">${k}</div><div class="v">${p} <small>${v}</small></div></div>`;
 function row(lab,val,b){return `<div class="row"><span class="lab">${lab}</span><span class="val">${val||'—'}<span class="mk">${mk(b)}</span></span></div>`}
 function mdLabel(d){const p=(d||'').split('-');return p.length===3?`${+p[1]}月${+p[2]}日`:d}
+function weekday(d){const p=(d||'').split('-');if(p.length!==3)return'';return ['周日','周一','周二','周三','周四','周五','周六'][new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).getUTCDay()];}
+function dayHeader(d){const w=weekday(d);return `📅 ${mdLabel(d)}${w?' · '+w:''}`;}
 const FILTERS=[["all","全部"],["pending","待核"],["done","已结束"],["winHit","胜负✓"],["winMiss","胜负✗"],["scoreHit","比分✓"]];
 let DATA=[],flt="all",q="";
 function stat(r){return r.settled?"已结束":"待核"}
@@ -86,9 +89,10 @@ function render(){
   const rows=DATA.filter(pass).slice().sort((a,b)=>(a.kickoff||a.date).localeCompare(b.kickoff||b.date));
   const list=document.getElementById("list");
   if(!rows.length){list.innerHTML='<div class="empty">没有匹配的比赛</div>';return;}
+  const cnt={};rows.forEach(r=>cnt[r.date]=(cnt[r.date]||0)+1);
   let html="",curDate=null,open=false;
   rows.forEach(r=>{
-    if(r.date!==curDate){ if(open)html+="</div>"; curDate=r.date; html+=`<div class="daseg">📅 ${mdLabel(r.date)}</div><div class="grid">`; open=true;}
+    if(r.date!==curDate){ if(open)html+="</div>"; curDate=r.date; html+=`<div class="daseg">${dayHeader(r.date)}<span class="cnt">共${cnt[r.date]}场</span></div><div class="grid">`; open=true;}
     const settled=r.settled, sHit= settled?(r.hitPrimary===true||r.hitSecondary===true):null;
     const pill= settled?'<span class="pill done">已结束</span>':'<span class="pill">待核</span>';
     const t=(r.kickoff||"").slice(5).replace("-","/");
