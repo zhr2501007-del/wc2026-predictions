@@ -17,8 +17,16 @@
  .scard .v{font-size:26px;font-weight:800;margin-top:3px}
  .scard .v small{font-size:12px;color:var(--mut);font-weight:400}
  .mini{color:var(--mut);font-size:11px;margin:4px 2px 14px}
- .search{width:100%;padding:11px 13px;font-size:15px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg);margin-bottom:10px}
+ .searchbar{position:relative;margin-bottom:10px}
+ .search{width:100%;padding:11px 48px 11px 13px;font-size:15px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
  .search::placeholder{color:var(--mut)}
+ .fbtn{position:absolute;right:6px;top:6px;bottom:6px;width:38px;border:none;border-radius:9px;background:var(--pill);color:var(--fg);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+ .fbtn.on{background:var(--accent);color:#fff}
+ .fmenu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.45);min-width:180px;max-height:280px;overflow:auto;padding:5px}
+ .fmenu[hidden]{display:none}
+ .fmenu .opt{padding:10px 12px;font-size:13px;border-radius:8px;cursor:pointer;white-space:nowrap}
+ .fmenu .opt:active,.fmenu .opt:hover{background:var(--pill)}
+ .fmenu .opt.on{color:var(--accent);font-weight:700}
  .chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;padding-bottom:2px;scrollbar-width:none}
  .chips::-webkit-scrollbar{display:none}
  .chip{flex:0 0 auto;white-space:nowrap;font-size:12px;color:var(--mut);background:var(--pill);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;user-select:none}
@@ -54,7 +62,11 @@
  <div class="sub">胜负=晋级方 · 主/次两档比分，<b>任一命中即算比分命中（容错）</b> · 只比90分钟 · 每小时自动核对。</div>
  <div class="sum" id="summary"></div>
  <div class="mini" id="mini"></div>
- <input class="search" id="q" placeholder="🔍 搜索：球队/时间/轮次（如 英 · 塞内加尔 · Belgium · 07-02 · 已结束）">
+ <div class="searchbar">
+   <input class="search" id="q" placeholder="🔍 搜索球队（如 英 · 塞内加尔 · Belgium）">
+   <button class="fbtn" id="fbtn" aria-label="按日期筛选" title="按日期筛选">📅</button>
+   <div class="fmenu" id="fmenu" hidden></div>
+ </div>
  <div class="chips" id="chips"></div>
  <div id="list"></div>
  <div class="foot" id="foot"></div>
@@ -69,7 +81,7 @@ function mdLabel(d){const p=(d||'').split('-');return p.length===3?`${+p[1]}月$
 function weekday(d){const p=(d||'').split('-');if(p.length!==3)return'';return ['周日','周一','周二','周三','周四','周五','周六'][new Date(Date.UTC(+p[0],+p[1]-1,+p[2])).getUTCDay()];}
 function dayHeader(d){const w=weekday(d);return `📅 ${mdLabel(d)}${w?' · '+w:''}`;}
 const FILTERS=[["all","全部"],["pending","待核"],["done","已结束"],["winHit","胜负✓"],["winMiss","胜负✗"],["scoreHit","比分✓"]];
-let DATA=[],flt="all",q="";
+let DATA=[],flt="all",q="",dateFilter="";
 function stat(r){return r.settled?"已结束":"待核"}
 function searchText(r){
   let al="";Object.keys(ALIAS).forEach(k=>{if((r.match||"").includes(k))al+=" "+ALIAS[k]});
@@ -77,6 +89,7 @@ function searchText(r){
   return [r.match,r.winner,r.primary,r.secondary,r.round,r.date,mdLabel(r.date),r.kickoff,r.actual,stat(r),tags,al].join(" ").toLowerCase();
 }
 function pass(r){
+  if(dateFilter && r.date!==dateFilter)return false;
   if(flt==="pending"&&r.settled)return false;
   if(flt==="done"&&!r.settled)return false;
   if(flt==="winHit"&&!(r.settled&&r.hitWinner))return false;
@@ -110,6 +123,14 @@ function render(){
 }
 function drawChips(){document.getElementById("chips").innerHTML=FILTERS.map(f=>`<span class="chip ${f[0]===flt?'on':''}" data-f="${f[0]}">${f[1]}</span>`).join("");
   document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{flt=c.dataset.f;drawChips();render();});}
+function syncFbtn(){document.getElementById("fbtn").classList.toggle("on",!!dateFilter);}
+function drawDateMenu(){
+  const dates=[...new Set(DATA.map(r=>r.date))].sort();
+  const opts=[["","全部日期"]].concat(dates.map(d=>[d, dayHeader(d).replace("📅 ","")]));
+  const m=document.getElementById("fmenu");
+  m.innerHTML=opts.map(o=>`<div class="opt ${o[0]===dateFilter?'on':''}" data-d="${o[0]}">${o[1]}</div>`).join("");
+  m.querySelectorAll(".opt").forEach(o=>o.onclick=()=>{dateFilter=o.dataset.d;m.hidden=true;syncFbtn();render();});
+}
 fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(rows=>{
   DATA=rows;
   const s=rows.filter(r=>r.settled), n=s.length;
@@ -122,6 +143,8 @@ fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(rows=>{
   drawChips();render();
 });
 document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim();render();});
+document.getElementById('fbtn').addEventListener('click',e=>{e.stopPropagation();const m=document.getElementById('fmenu');if(m.hidden){drawDateMenu();m.hidden=false;}else{m.hidden=true;}});
+document.addEventListener('click',e=>{if(!e.target.closest('.searchbar'))document.getElementById('fmenu').hidden=true;});
 </script>
 </body>
 </html>
