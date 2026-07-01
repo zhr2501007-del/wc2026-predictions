@@ -20,14 +20,13 @@
  .searchbar{position:relative;margin-bottom:10px}
  .search{width:100%;padding:11px 48px 11px 13px;font-size:15px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--fg)}
  .search::placeholder{color:var(--mut)}
- .fbtn{position:absolute;right:6px;top:6px;bottom:6px;width:38px;border:none;border-radius:9px;background:var(--pill);color:var(--fg);font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+ .fbtnwrap{position:absolute;right:6px;top:6px;bottom:6px;width:38px}
+ .fbtn{position:absolute;top:0;right:0;bottom:0;left:0;border:none;border-radius:9px;background:var(--pill);color:var(--fg);font-size:16px;display:flex;align-items:center;justify-content:center;pointer-events:none}
  .fbtn.on{background:var(--accent);color:#fff}
- .fmenu{position:absolute;right:0;top:calc(100% + 6px);z-index:5;background:var(--card);border:1px solid var(--line);border-radius:12px;box-shadow:0 10px 28px rgba(0,0,0,.45);min-width:180px;max-height:280px;overflow:auto;padding:5px}
- .fmenu[hidden]{display:none}
- .fmrow{font-size:12px;color:var(--mut);padding:4px 6px 6px}
- .dpick{width:100%;padding:9px 10px;font-size:14px;border-radius:8px;border:1px solid var(--line);background:var(--card2);color:var(--fg);color-scheme:dark}
- .fmclear{margin-top:8px;padding:9px 10px;font-size:13px;text-align:center;border-radius:8px;cursor:pointer;background:var(--pill);color:var(--fg)}
- .fmclear:active{opacity:.7}
+ .dpick-overlay{position:absolute;top:0;right:0;bottom:0;left:0;width:100%;height:100%;opacity:0;border:0;padding:0;margin:0;cursor:pointer;-webkit-appearance:none;color-scheme:dark}
+ .datechip{display:inline-flex;align-items:center;gap:8px;margin:-2px 0 12px;padding:7px 12px;font-size:13px;background:var(--pill);border:1px solid var(--accent);border-radius:999px;color:var(--fg);cursor:pointer}
+ .datechip[hidden]{display:none}
+ .datechip .x{color:var(--mut);font-weight:800}
  .chips{display:flex;gap:6px;flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;margin-bottom:16px;padding-bottom:2px;scrollbar-width:none}
  .chips::-webkit-scrollbar{display:none}
  .chip{flex:0 0 auto;white-space:nowrap;font-size:12px;color:var(--mut);background:var(--pill);border:1px solid var(--line);border-radius:999px;padding:5px 11px;cursor:pointer;user-select:none}
@@ -65,13 +64,12 @@
  <div class="mini" id="mini"></div>
  <div class="searchbar">
    <input class="search" id="q" placeholder="🔍 搜索球队（如 英 · 塞内加尔 · Belgium）">
-   <button class="fbtn" id="fbtn" aria-label="按日期筛选" title="按日期筛选">📅</button>
-   <div class="fmenu" id="fmenu" hidden>
-     <div class="fmrow">📅 选择日期（北京）</div>
-     <input type="date" id="dpick" class="dpick">
-     <div class="fmclear" id="fmclear">全部日期（清除筛选）</div>
+   <div class="fbtnwrap">
+     <button class="fbtn" id="fbtn" aria-hidden="true">📅</button>
+     <input type="date" id="dpick" class="dpick-overlay" aria-label="按日期筛选">
    </div>
  </div>
+ <div class="datechip" id="datechip" hidden></div>
  <div class="chips" id="chips"></div>
  <div id="list"></div>
  <div class="foot" id="foot"></div>
@@ -128,13 +126,12 @@ function render(){
 }
 function drawChips(){document.getElementById("chips").innerHTML=FILTERS.map(f=>`<span class="chip ${f[0]===flt?'on':''}" data-f="${f[0]}">${f[1]}</span>`).join("");
   document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{flt=c.dataset.f;drawChips();render();});}
-function syncFbtn(){document.getElementById("fbtn").classList.toggle("on",!!dateFilter);}
-function openDateMenu(){
-  const dates=[...new Set(DATA.map(r=>r.date))].sort();
-  const dp=document.getElementById("dpick");
-  if(dates.length){dp.min=dates[0];dp.max=dates[dates.length-1];}
-  dp.value=dateFilter||"";
-  document.getElementById("fmenu").hidden=false;
+function updateDateUI(){
+  const on=!!dateFilter;
+  document.getElementById("fbtn").classList.toggle("on",on);
+  const chip=document.getElementById("datechip");
+  if(on){chip.hidden=false;chip.innerHTML=`📅 ${dayHeader(dateFilter).replace("📅 ","")} <span class="x">✕ 清除</span>`;}
+  else chip.hidden=true;
 }
 fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(rows=>{
   DATA=rows;
@@ -145,13 +142,13 @@ fetch('./data.json?_='+Date.now()).then(r=>r.json()).then(rows=>{
   document.getElementById('summary').innerHTML=scard('胜负 / 晋级', win+' / '+n, pct(win,n))+scard('比分命中 · 容错', sh+' / '+n, pct(sh,n));
   document.getElementById('mini').innerHTML= n? `其中「主比分严格命中」${pri} / ${n}（${pct(pri,n)}）· 已结算 ${n} 场`:'尚无已结算场次，等赛后自动核对';
   document.getElementById('foot').innerHTML='盲测校准（回测，不计入实盘）：晋级 6/7 · 精确比分 3/7 —— 见 <a href="https://github.com/zhr2501007-del/wc2026-predictions/blob/main/BACKTEST.md">BACKTEST.md</a>。真实结果均来自 web 检索核对，未核实标「待核」。';
-  drawChips();render();
+  const dts=[...new Set(rows.map(r=>r.date))].sort();
+  const dp=document.getElementById('dpick');if(dts.length){dp.min=dts[0];dp.max=dts[dts.length-1];}
+  drawChips();updateDateUI();render();
 });
 document.getElementById('q').addEventListener('input',e=>{q=e.target.value.trim();render();});
-document.getElementById('fbtn').addEventListener('click',e=>{e.stopPropagation();const m=document.getElementById('fmenu');if(m.hidden){openDateMenu();}else{m.hidden=true;}});
-document.getElementById('dpick').addEventListener('change',e=>{dateFilter=e.target.value;document.getElementById('fmenu').hidden=true;syncFbtn();render();});
-document.getElementById('fmclear').addEventListener('click',()=>{dateFilter="";document.getElementById('dpick').value="";document.getElementById('fmenu').hidden=true;syncFbtn();render();});
-document.addEventListener('click',e=>{if(!e.target.closest('.searchbar'))document.getElementById('fmenu').hidden=true;});
+document.getElementById('dpick').addEventListener('change',e=>{dateFilter=e.target.value;updateDateUI();render();});
+document.getElementById('datechip').addEventListener('click',()=>{dateFilter="";document.getElementById('dpick').value="";updateDateUI();render();});
 </script>
 </body>
 </html>
