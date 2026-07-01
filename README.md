@@ -13,7 +13,9 @@
 - 页面另单列「主比分严格命中率」透明对照，不掩盖容错带来的宽松。
 
 ## data.json 每条字段
-`round, date, match, winner(胜负预测), primary(主比分), secondary(次比分), actual(真实90'), advancer(实际晋级), hitWinner, hitPrimary, hitSecondary, settled`
+`round, date, kickoff(北京开赛时间如"2026-07-03 03:00"), match, winner(胜负预测), primary(主比分), secondary(次比分), actual(真实90'), advancer(实际晋级), hitWinner, hitPrimary, hitSecondary, settled`
+
+页面支持：按开赛时间排序分组、模糊/关联/英文别名搜索、按状态(待核/已结束/胜负命中/未中/比分命中)筛选。
 
 ## 每日维护流程（云端 agent 执行）
 1. **核对**：读 data.json，对 `settled:false` 的场次用 web 检索真实终场比分与晋级方；回填 `actual/advancer` 及 `hitWinner/hitPrimary/hitSecondary`，置 `settled:true`。查不到保持 false，下次再补，绝不臆造。

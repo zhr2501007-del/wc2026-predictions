@@ -1,5 +1,5 @@
 [
-  {"round":"R32","date":"2026-07-02","match":"英格兰 vs 刚果(金)","winner":"英格兰","primary":"2-0","secondary":"2-1","actual":"英格兰 2-1","advancer":"英格兰","hitWinner":true,"hitPrimary":false,"hitSecondary":true,"settled":true},
-  {"round":"R32","date":"2026-07-02","match":"比利时 vs 塞内加尔","winner":"比利时","primary":"2-1","secondary":"1-1","actual":"","advancer":"","hitWinner":null,"hitPrimary":null,"hitSecondary":null,"settled":false},
-  {"round":"R32","date":"2026-07-02","match":"美国 vs 波黑","winner":"美国","primary":"2-1","secondary":"2-0","actual":"","advancer":"","hitWinner":null,"hitPrimary":null,"hitSecondary":null,"settled":false}
+  {"round":"R32","date":"2026-07-02","kickoff":"2026-07-02 00:00","match":"英格兰 vs 刚果(金)","winner":"英格兰","primary":"2-0","secondary":"2-1","actual":"英格兰 2-1","advancer":"英格兰","hitWinner":true,"hitPrimary":false,"hitSecondary":true,"settled":true},
+  {"round":"R32","date":"2026-07-02","kickoff":"2026-07-02 04:00","match":"比利时 vs 塞内加尔","winner":"比利时","primary":"2-1","secondary":"1-1","actual":"","advancer":"","hitWinner":null,"hitPrimary":null,"hitSecondary":null,"settled":false},
+  {"round":"R32","date":"2026-07-02","kickoff":"2026-07-02 08:00","match":"美国 vs 波黑","winner":"美国","primary":"2-1","secondary":"2-0","actual":"","advancer":"","hitWinner":null,"hitPrimary":null,"hitSecondary":null,"settled":false}
 ]
