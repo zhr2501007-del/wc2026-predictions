@@ -43,5 +43,20 @@
     "hitPrimary": false,
     "hitSecondary": true,
     "settled": true
+  },
+  {
+    "round": "R32",
+    "date": "2026-07-03",
+    "kickoff": "2026-07-03 03:00",
+    "match": "西班牙 vs 奥地利",
+    "winner": "西班牙",
+    "primary": "2-0",
+    "secondary": "1-0",
+    "actual": "",
+    "advancer": "",
+    "hitWinner": null,
+    "hitPrimary": null,
+    "hitSecondary": null,
+    "settled": false
   }
 ]
