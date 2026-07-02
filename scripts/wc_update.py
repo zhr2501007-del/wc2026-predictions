@@ -9,7 +9,8 @@ import json, os, re, sys, pathlib
 from datetime import datetime, timezone, timedelta
 
 if not os.environ.get("ANTHROPIC_API_KEY"):
-    print("ANTHROPIC_API_KEY 未设置——请在仓库 Settings→Secrets 添加后再跑。跳过。")
+    # ::warning:: 让 GitHub Actions 在 run 页面挂黄色注解,空转不再静默(run 保持绿色,避免每30分钟告警轰炸)
+    print("::warning title=WC2026 自动维护空转::ANTHROPIC_API_KEY 未设置,本次未核对/未预测。请在仓库 Settings→Secrets and variables→Actions 添加。")
     sys.exit(0)
 
 import anthropic
