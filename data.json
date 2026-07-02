@@ -37,11 +37,11 @@
     "winner": "美国",
     "primary": "2-1",
     "secondary": "2-0",
-    "actual": "",
-    "advancer": "",
-    "hitWinner": null,
-    "hitPrimary": null,
-    "hitSecondary": null,
-    "settled": false
+    "actual": "美国 2-0",
+    "advancer": "美国",
+    "hitWinner": true,
+    "hitPrimary": false,
+    "hitSecondary": true,
+    "settled": true
   }
 ]
