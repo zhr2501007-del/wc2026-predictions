@@ -58,5 +58,35 @@
     "hitPrimary": null,
     "hitSecondary": null,
     "settled": false
+  },
+  {
+    "round": "R32",
+    "date": "2026-07-03",
+    "kickoff": "2026-07-03 07:00",
+    "match": "葡萄牙 vs 克罗地亚",
+    "winner": "葡萄牙",
+    "primary": "2-1",
+    "secondary": "1-0",
+    "actual": "",
+    "advancer": "",
+    "hitWinner": null,
+    "hitPrimary": null,
+    "hitSecondary": null,
+    "settled": false
+  },
+  {
+    "round": "R32",
+    "date": "2026-07-03",
+    "kickoff": "2026-07-03 11:00",
+    "match": "瑞士 vs 阿尔及利亚",
+    "winner": "瑞士",
+    "primary": "1-0",
+    "secondary": "2-1",
+    "actual": "",
+    "advancer": "",
+    "hitWinner": null,
+    "hitPrimary": null,
+    "hitSecondary": null,
+    "settled": false
   }
 ]
